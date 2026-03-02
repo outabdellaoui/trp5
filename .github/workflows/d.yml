@@ -1,39 +1,52 @@
-name: CI de tp5
+name: CI de TP5
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   pull_request:
-    branches:
-      - main
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
-      - name: Récupérer le code
+      # 1️⃣ Récupérer le code
+      - name: Checkout du code
         uses: actions/checkout@v4
 
-      - name: Installer Python
-        uses: actions/setup-python@v4
+      # 2️⃣ Installer Python
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
+      # 3️⃣ Mettre à jour pip
+      - name: Mettre à jour pip
+        run: python -m pip install --upgrade pip
+
+      # 4️⃣ Installer les dépendances
       - name: Installer les dépendances
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          if (Test-Path "requirements.txt") {
+              python -m pip install -r requirements.txt
+          }
 
-      - name: Lint le code
+      # 5️⃣ Installer pytest, coverage et flake8
+      - name: Installer outils QA
         run: |
-          pip install flake8
-          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-          flake8 . --count --max-complexity=10 --max-line-length=127 --statistics
+          python -m pip install pytest pytest-cov flake8
 
+      # 6️⃣ Analyse du code avec flake8
+      - name: Lint du code
+        run: |
+          python -m flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          python -m flake8 . --count --max-complexity=10 --max-line-length=127 --statistics
+          python -m flake8 . --count --max-line-length=127 --statistics
+
+      # 7️⃣ Lancer les tests
       - name: Lancer les tests
         run: |
-          pip install pytest pytest-cov
-          pytest -v --cov=app
+          $env:PYTHONPATH="${{ github.workspace }}"
+          python -m pytest -v --cov=app --cov-report=xml --cov-report=term

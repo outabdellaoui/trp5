@@ -1,14 +1,24 @@
 import pytest
-from app.user_manager import create_user
+from app.user_manager import UserManager
 
+def test_add_user():
+    manager = UserManager()
+    manager.add_user("adam")
+    assert manager.count_users() == 1
 
-def test_create_user():
-    user = create_user("otman", "otman@example.com")
-    assert isinstance(user, dict)
-    assert user["username"] == "otman"
-    assert user["email"] == "otman@example.com"
-
-
-def test_create_user_missing_username():
+def test_add_existing_user():
+    manager = UserManager()
+    manager.add_user("adam")
     with pytest.raises(ValueError):
-        create_user("", "email@example.com")
+        manager.add_user("adam")
+
+def test_remove_user():
+    manager = UserManager()
+    manager.add_user("youssef")
+    manager.remove_user("youssef")
+    assert manager.count_users() == 0
+
+def test_remove_unknown_user():
+    manager = UserManager()
+    with pytest.raises(ValueError):
+        manager.remove_user("saad")

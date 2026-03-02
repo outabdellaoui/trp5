@@ -12,10 +12,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Set up Python 3.11
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v4
         with:
           python-version: '3.11'
 
@@ -30,10 +30,10 @@ jobs:
     needs: lint
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Set up Python 3.11
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v4
         with:
           python-version: '3.11'
 
@@ -44,4 +44,4 @@ jobs:
         run: pip install pytest pytest-cov
 
       - name: Run tests with coverage
-        run: PYTHONPATH=$PYTHONPATH:. pytest --cov=app tests/
+        run: PYTHONPATH=$PYTHONPATH:$GITHUB_WORKSPACE pytest --cov=app tests/
